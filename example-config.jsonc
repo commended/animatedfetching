@@ -1,0 +1,77 @@
+// Example AnimatedFetching Configuration File
+// This file uses JSONC format (JSON with Comments)
+// Copy this to ~/.config/animatedfetching/config.jsonc and customize
+
+{
+  // Animation settings
+  "animation": {
+    "enabled": true,                                    // Enable/disable GIF animation
+    "path": "~/.config/animatedfetching/animation.gif", // Path to your GIF file
+    "width": 40,                                        // Width in characters
+    "fps": 10                                           // Frames per second
+  },
+  
+  // System information sections to display
+  // Available keys: os, kernel, uptime, shell, terminal, cpu, memory, disk, hostname
+  "info_sections": [
+    {"label": "OS", "key": "os", "color": "cyan"},
+    {"label": "Kernel", "key": "kernel", "color": "blue"},
+    {"label": "Uptime", "key": "uptime", "color": "green"},
+    {"label": "Shell", "key": "shell", "color": "yellow"},
+    {"label": "Terminal", "key": "terminal", "color": "magenta"},
+    {"label": "CPU", "key": "cpu", "color": "red"},
+    {"label": "Memory", "key": "memory", "color": "cyan"},
+    {"label": "Disk", "key": "disk", "color": "blue"}
+  ],
+  
+  // Interactive buttons that run commands
+  // Press the specified key in interactive mode to run the command
+  "buttons": [
+    {
+      "label": "System Update",                          // Display name
+      "command": "sudo apt update && sudo apt upgrade",  // Command to run
+      "key": "u",                                        // Keyboard shortcut
+      "color": "green"                                   // Color for display
+    },
+    {
+      "label": "Neofetch",
+      "command": "neofetch",
+      "key": "n",
+      "color": "cyan"
+    },
+    {
+      "label": "Disk Usage",
+      "command": "df -h",
+      "key": "d",
+      "color": "yellow"
+    },
+    {
+      "label": "Top Processes",
+      "command": "top",
+      "key": "t",
+      "color": "red"
+    },
+    {
+      "label": "Network Info",
+      "command": "ip addr show",
+      "key": "i",
+      "color": "blue"
+    }
+  ],
+  
+  // Layout and display settings
+  "layout": {
+    "title": "System Information",  // Title at the top
+    "show_hostname": true,          // Show hostname in info section
+    "separator": "─",               // Character for separators
+    "padding": 2                    // Padding around elements
+  },
+  
+  // Color scheme for various elements
+  // Available colors: cyan, blue, green, yellow, magenta, red, white, bright_*, dim, bold
+  "colors": {
+    "title": "bold cyan",    // Style for the title
+    "label": "bold",         // Style for info labels
+    "separator": "dim"       // Style for separators
+  }
+}
