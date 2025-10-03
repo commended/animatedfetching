@@ -1,260 +1,176 @@
 # AnimatedFetching
 
-An animated terminal fetch program designed by aug with animated GIF support, customizable configuration, and clickable buttons for running commands.
+An animated terminal fetch program written in C, designed by aug with animated GIF support. Inspired by fastfetch, with GIF logo display centered above system information.
+
+> **Note**: This repository previously contained a Python implementation. The C version is now the primary implementation, offering better performance and lower dependencies. The Python code remains in the repository for reference.
 
 ## Quick Start
 
 Get started in 3 simple steps:
 
 ```bash
-# 1. Clone and install
+# 1. Clone the repository
 git clone https://github.com/commended/animatedfetching.git
 cd animatedfetching
-pip install -e .
 
-# 2. Run it!
-animatedfetching
-# or use the short alias
-afetch
+# 2. Run the setup script
+./setup.sh
+
+# 3. Run it!
+./bin/afetch
 ```
 
-That's it! On first run, AnimatedFetching will automatically:
-- ✨ Create a default configuration at `~/.config/animatedfetching/config.jsonc`
-- 🎨 Install a default GitHub logo animation at `~/.config/animatedfetching/animation.gif`
-- 🚀 Display your system information with the animated logo
+That's it! The setup script will:
+- Check for required dependencies (giflib)
+- Build the program
+- Create the configuration directory
+- Install the default GIF animation
+
+The program will display your system information with the GIF logo centered above it.
 
 ## Features
 
-- 🎨 **Animated GIF Support**: Display animated GIFs in your terminal alongside system information
-- 🔧 **Highly Customizable**: Configure everything via JSONC files (JSON with Comments)
-- 🖱️ **Interactive Buttons**: Clickable buttons to run terminal commands
-- 📊 **System Information**: Display OS, kernel, uptime, CPU, memory, disk, and more
-- 🎯 **Fastfetch-like**: Similar configuration style and functionality to fastfetch
+- 🎨 **Animated GIF Support**: Display animated GIFs as logos in your terminal
+- 🚀 **Written in C**: Fast and lightweight, inspired by fastfetch
+- 📊 **System Information**: Display OS, kernel, uptime, CPU, memory, and more
+- 🎯 **Centered Layout**: GIF displayed on top, system info centered below
+- 🖥️ **Terminal Colors**: Full 24-bit RGB color support for GIF rendering
 
 ## Installation
 
-### Quick Install (Recommended)
+### Quick Setup (Recommended)
 
 ```bash
 git clone https://github.com/commended/animatedfetching.git
 cd animatedfetching
-pip install -e .
+./setup.sh
 ```
 
-No additional setup required! Just run `animatedfetching` or `afetch` and it will set up everything on first run.
+The setup script will automatically:
+1. Check for dependencies
+2. Build the program
+3. Create configuration directory at `~/.config/animatedfetching`
+4. Install the default GIF animation
 
-### Manual Configuration (Optional)
-
-If you want to create the configuration before first run:
-
-```bash
-animatedfetching --create-config
-```
-
-### From Source
+### Manual Build
 
 ```bash
 git clone https://github.com/commended/animatedfetching.git
 cd animatedfetching
-pip install -e .
+make
 ```
+
+### Install System-wide
+
+```bash
+sudo make install
+```
+
+This installs the binary to `/usr/local/bin/afetch`.
 
 ### Dependencies
 
-The following Python packages are required:
-- rich >= 13.0.0
-- Pillow >= 10.0.0
-- psutil >= 5.9.0
-- distro >= 1.8.0
-- jsoncomment >= 0.4.2
+The following libraries are required:
+- giflib (libgif-dev on Debian/Ubuntu, giflib-devel on Fedora)
+
+Install on Debian/Ubuntu:
+```bash
+sudo apt install libgif-dev
+```
+
+Install on Fedora:
+```bash
+sudo dnf install giflib-devel
+```
+
+Install on Arch:
+```bash
+sudo pacman -S giflib
+```
 
 ## Usage
 
 ### Basic Usage
 
-Display system information:
+Display system information with GIF logo:
 
 ```bash
-animatedfetching
-# or use the short alias
+./bin/afetch
+# or if installed system-wide:
 afetch
 ```
 
-### Interactive Mode
+### Custom GIF
 
-Run in interactive mode with clickable buttons:
+Use a custom GIF file:
 
 ```bash
-animatedfetching --interactive
+afetch --gif /path/to/your/animation.gif
 # or
-afetch -i
+afetch -g /path/to/your/animation.gif
 ```
 
-In interactive mode, you can press the configured keys (e.g., 'u', 'n', 'd', 't') to run the associated commands.
+The default GIF location is `~/.config/animatedfetching/animation.gif`.
 
-### Create Default Configuration
+## How It Works
 
-Create a default configuration file at `~/.config/animatedfetching/config.jsonc`:
+AnimatedFetching is a C program that:
 
-```bash
-animatedfetching --create-config
-```
+1. **Gathers System Information**: Uses Linux system calls to collect information about your system (hostname, OS, kernel, uptime, shell, terminal, CPU, memory)
+2. **Loads GIF Files**: Uses the giflib library to load and decode GIF images
+3. **Renders in Terminal**: Converts GIF pixels to colored block characters (█) using 24-bit RGB ANSI escape codes
+4. **Centers Output**: Calculates terminal width and centers both the GIF and system information
 
-### Use Custom Configuration
+The implementation is inspired by fastfetch's approach to system information gathering, with added GIF rendering capabilities.
 
-```bash
-animatedfetching --config /path/to/config.jsonc
-```
+### Technical Details
 
-## Configuration
+- **Language**: C11 standard
+- **System Info**: Direct system calls (`gethostname`, `uname`, `sysinfo`) and `/proc` filesystem parsing
+- **GIF Decoding**: giflib library for reading GIF files
+- **Terminal Output**: 24-bit RGB ANSI escape sequences (`\033[38;2;R;G;Bm`)
+- **Centering**: Dynamic calculation based on `ioctl(TIOCGWINSZ)` for terminal width
+- **Frame Selection**: Displays the first frame of animated GIFs (static display)
 
-Configuration is stored in JSONC format (JSON with Comments) at:
-`~/.config/animatedfetching/config.jsonc`
-
-### Example Configuration
-
-```jsonc
-{
-  // Animation settings
-  "animation": {
-    "enabled": true,
-    "path": "~/.config/animatedfetching/animation.gif",
-    "width": 40,
-    "fps": 10
-  },
-  
-  // System information sections to display
-  "info_sections": [
-    {"label": "OS", "key": "os", "color": "cyan"},
-    {"label": "Kernel", "key": "kernel", "color": "blue"},
-    {"label": "Uptime", "key": "uptime", "color": "green"},
-    {"label": "Shell", "key": "shell", "color": "yellow"},
-    {"label": "Terminal", "key": "terminal", "color": "magenta"},
-    {"label": "CPU", "key": "cpu", "color": "red"},
-    {"label": "Memory", "key": "memory", "color": "cyan"},
-    {"label": "Disk", "key": "disk", "color": "blue"}
-  ],
-  
-  // Interactive buttons
-  "buttons": [
-    {
-      "label": "System Update",
-      "command": "sudo apt update && sudo apt upgrade",
-      "key": "u",
-      "color": "green"
-    },
-    {
-      "label": "Neofetch",
-      "command": "neofetch",
-      "key": "n",
-      "color": "cyan"
-    },
-    {
-      "label": "Disk Usage",
-      "command": "df -h",
-      "key": "d",
-      "color": "yellow"
-    },
-    {
-      "label": "Top Processes",
-      "command": "top",
-      "key": "t",
-      "color": "red"
-    }
-  ],
-  
-  // Layout settings
-  "layout": {
-    "title": "System Information",
-    "show_hostname": true,
-    "separator": "─",
-    "padding": 2
-  },
-  
-  // Color scheme
-  "colors": {
-    "title": "bold cyan",
-    "label": "bold",
-    "separator": "dim"
-  }
-}
-```
-
-### Configuration Options
-
-#### Animation Section
-- `enabled`: Enable/disable animated GIF display
-- `path`: Path to your GIF file (supports `~` expansion)
-- `width`: Width of the animation in characters (default: 40)
-- `fps`: Frames per second for animation (default: 10)
-
-#### Info Sections
-Each section has:
-- `label`: Display name for the information
-- `key`: System info key (os, kernel, uptime, shell, terminal, cpu, memory, disk, hostname)
-- `color`: Color for the label (cyan, blue, green, yellow, magenta, red, white, etc.)
-
-#### Buttons
-Each button has:
-- `label`: Display name for the button
-- `command`: Shell command to run when button is pressed
-- `key`: Keyboard shortcut (single character)
-- `color`: Color for the button display
-
-#### Layout Options
-- `title`: Title displayed at the top
-- `show_hostname`: Show hostname in the info display
-- `separator`: Character(s) to use as separator
-- `padding`: Padding around elements
-
-#### Colors
-- `title`: Style for the title
-- `label`: Style for labels
-- `separator`: Style for separators
+For more detailed design information, see [DESIGN.md](DESIGN.md).
 
 ## Command Line Options
 
 ```
-usage: animatedfetching [-h] [-c CONFIG] [--create-config] [-i]
+Usage: afetch [OPTIONS]
 
-AnimatedFetching - A terminal fetch program with animated GIF support
+AnimatedFetching - A terminal fetch program with GIF support
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -c CONFIG, --config CONFIG
-                        Path to configuration file
-  --create-config       Create default configuration file
-  -i, --interactive     Run in interactive mode with button support
+Options:
+  -g, --gif <path>    Path to GIF file (default: ~/.config/animatedfetching/animation.gif)
+  -h, --help          Show this help message
 ```
 
 ## Examples
 
-### Display system info with default config:
+### Display with default GIF:
 ```bash
-animatedfetching
+afetch
 ```
 
-### Run interactively:
+### Use custom GIF:
 ```bash
-animatedfetching -i
+afetch --gif ~/Pictures/my-logo.gif
 ```
 
-### Use custom config:
+### Setup default GIF location:
 ```bash
-animatedfetching -c ~/my-custom-config.jsonc
-```
-
-### Create default config:
-```bash
-animatedfetching --create-config
+mkdir -p ~/.config/animatedfetching
+cp my-animation.gif ~/.config/animatedfetching/animation.gif
+afetch
 ```
 
 ## Tips
 
-1. **Add your own GIF**: Place any GIF file at `~/.config/animatedfetching/animation.gif` or configure a custom path
-2. **Customize buttons**: Add your own frequently-used commands as buttons
-3. **Color schemes**: Use any Rich library color names (cyan, blue, green, yellow, magenta, red, bright_blue, etc.)
-4. **Info sections**: Reorder sections in the config to change display order
+1. **Add your own GIF**: Place any GIF file at `~/.config/animatedfetching/animation.gif`
+2. **Terminal compatibility**: Best viewed in terminals with 24-bit RGB color support (most modern terminals)
+3. **GIF size**: Keep GIFs reasonably sized (under 1MB) for faster loading
+4. **First frame**: Currently displays only the first frame of animated GIFs (static display)
 
 ## License
 
