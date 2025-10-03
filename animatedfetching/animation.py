@@ -8,6 +8,7 @@ import time
 from threading import Thread, Event
 from PIL import Image
 from rich.console import Console
+from rich.align import Align
 
 class AnimatedGIF:
     """Handles animated GIF display in terminal"""
@@ -17,8 +18,10 @@ class AnimatedGIF:
         self.width = width
         self.fps = fps
         self.frames = []
+        self.frame_durations = []  # Store duration for each frame
         self.stop_event = Event()
         self.thread = None
+        self.current_frame = 0
         
         if os.path.exists(self.gif_path):
             self._load_frames()
@@ -31,6 +34,10 @@ class AnimatedGIF:
             
             while True:
                 try:
+                    # Get frame duration (in milliseconds, default to 100ms if not specified)
+                    duration = img.info.get('duration', 100) / 1000.0  # Convert to seconds
+                    self.frame_durations.append(duration)
+                    
                     # Resize frame
                     aspect_ratio = img.height / img.width
                     new_height = int(self.width * aspect_ratio * 0.5)  # 0.5 for char aspect ratio
@@ -70,24 +77,29 @@ class AnimatedGIF:
             return self.frames[0]
         return ""
     
-    def start_animation(self, console):
-        """Start animated display in a separate thread"""
-        if not self.frames:
-            return
-        
-        def animate():
-            frame_idx = 0
-            while not self.stop_event.is_set():
-                # This would need to be integrated with the main display
-                # For now, we'll return frames for static display
-                time.sleep(1.0 / self.fps)
-                frame_idx = (frame_idx + 1) % len(self.frames)
-        
-        self.thread = Thread(target=animate, daemon=True)
-        self.thread.start()
+    def get_current_frame(self):
+        """Get current frame for animation"""
+        if self.frames:
+            return self.frames[self.current_frame]
+        return ""
     
-    def stop_animation(self):
-        """Stop the animation"""
-        self.stop_event.set()
-        if self.thread:
-            self.thread.join(timeout=1.0)
+    def get_frame_count(self):
+        """Get total number of frames"""
+        return len(self.frames)
+    
+    def next_frame(self):
+        """Advance to next frame and return its duration"""
+        if not self.frames:
+            return 0.1
+        
+        self.current_frame = (self.current_frame + 1) % len(self.frames)
+        
+        # Use frame-specific duration or fallback to fps-based timing
+        if self.frame_durations and self.current_frame < len(self.frame_durations):
+            return self.frame_durations[self.current_frame]
+        else:
+            return 1.0 / self.fps
+    
+    def reset(self):
+        """Reset animation to first frame"""
+        self.current_frame = 0
