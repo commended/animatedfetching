@@ -20,6 +20,12 @@ wheels/
 .installed.cfg
 *.egg
 
+# C build artifacts
+*.o
+*.out
+bin/
+build/
+
 # Virtual environments
 venv/
 env/
