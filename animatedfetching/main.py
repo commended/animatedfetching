@@ -6,13 +6,16 @@ Main application module for AnimatedFetching
 import sys
 import os
 import subprocess
-from rich.console import Console
+import time
+from rich.console import Console, Group
 from rich.panel import Panel
 from rich.columns import Columns
 from rich.text import Text
 from rich.layout import Layout
 from rich.table import Table
 from rich.prompt import Prompt
+from rich.live import Live
+from rich.align import Align
 
 from .config import Config
 from .sysinfo import SystemInfo
@@ -49,21 +52,23 @@ class AnimatedFetching:
     
     def render_info_section(self):
         """Render system information section"""
-        table = Table(show_header=False, box=None, padding=(0, 2))
-        table.add_column("Label", style="bold")
+        table = Table(show_header=False, box=None, padding=(0, 1), collapse_padding=True)
+        table.add_column("Label", style="bold", no_wrap=True, width=10)
         table.add_column("Value")
         
-        # Add hostname if configured
+        # Add hostname if configured (more compact)
         if self.config.get('layout', {}).get('show_hostname', True):
             hostname = self.sysinfo.get('hostname', 'unknown')
             table.add_row(
-                Text("Host", style=self.config.get('colors', {}).get('title', 'bold cyan')),
-                Text(hostname, style="bold")
+                Text("━" * 25, style="dim"), ""
             )
-            
-            # Add separator
-            separator = self.config.get('layout', {}).get('separator', '─')
-            table.add_row(Text(separator * 40, style="dim"), "")
+            table.add_row(
+                Text(hostname, style=self.config.get('colors', {}).get('title', 'bold cyan')),
+                ""
+            )
+            table.add_row(
+                Text("━" * 25, style="dim"), ""
+            )
         
         # Add configured info sections
         for section in self.config.get('info_sections', []):
@@ -114,29 +119,87 @@ class AnimatedFetching:
         title = self.config.get('layout', {}).get('title', 'System Information')
         title_style = self.config.get('colors', {}).get('title', 'bold cyan')
         
-        self.console.print(f"\n[{title_style}]{title}[/{title_style}]\n")
-        
-        # Display animation and info side by side if animation exists
-        if self.animation:
-            frame = self.animation.get_static_frame()
-            if frame:
-                # Split screen layout
-                info_table = self.render_info_section()
-                
-                # Print side by side (simplified version)
-                self.console.print(info_table)
-            else:
-                self.console.print(self.render_info_section())
+        # If animation is enabled and has multiple frames, show animation
+        if self.animation and self.animation.get_frame_count() > 1:
+            self._display_animated()
         else:
-            self.console.print(self.render_info_section())
+            # Static display
+            self.console.print(f"\n[{title_style}]{title}[/{title_style}]\n")
+            
+            # Display static GIF if available
+            if self.animation:
+                frame = self.animation.get_static_frame()
+                if frame:
+                    self.console.print(Align.center(frame))
+                    self.console.print()  # Add spacing
+            
+            # Display info
+            self.console.print(Align.center(self.render_info_section()))
+            
+            # Display buttons
+            buttons_panel = self.render_buttons()
+            if buttons_panel:
+                self.console.print("\n")
+                self.console.print(buttons_panel)
+            
+            self.console.print("")
+    
+    def _display_animated(self):
+        """Display with animated GIF"""
+        title = self.config.get('layout', {}).get('title', 'System Information')
+        title_style = self.config.get('colors', {}).get('title', 'bold cyan')
         
-        # Display buttons
+        # Render static content
+        info_table = self.render_info_section()
         buttons_panel = self.render_buttons()
-        if buttons_panel:
-            self.console.print("\n")
-            self.console.print(buttons_panel)
         
-        self.console.print("")
+        # Create the display layout
+        def generate_display():
+            """Generate the current display with animation frame"""
+            output = []
+            
+            # Title
+            title_text = Text(title, style=title_style)
+            output.append(Align.center(title_text))
+            output.append("")
+            
+            # Get current animation frame
+            frame = self.animation.get_current_frame()
+            if frame:
+                # Center the frame
+                output.append(Align.center(frame))
+            
+            # Add info table (centered)
+            output.append(Align.center(info_table))
+            
+            # Add buttons if present
+            if buttons_panel:
+                output.append("")
+                output.append(buttons_panel)
+            
+            # Combine all elements
+            from rich.console import Group
+            return Group(*output)
+        
+        # Run animation with Live display
+        self.animation.reset()
+        
+        with Live(generate_display(), console=self.console, refresh_per_second=10, screen=False) as live:
+            try:
+                # Animation duration (default 5 seconds for non-interactive mode)
+                start_time = time.time()
+                duration = 5  # Show animation for 5 seconds
+                
+                while time.time() - start_time < duration:
+                    frame_duration = self.animation.next_frame()
+                    live.update(generate_display())
+                    time.sleep(frame_duration)
+                    
+            except KeyboardInterrupt:
+                pass
+        
+        # Show final static frame
+        self.console.print()
     
     def run_interactive(self):
         """Run in interactive mode with button support"""
