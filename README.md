@@ -2,6 +2,8 @@
 
 An animated terminal fetch program written in C, designed by aug with animated GIF support. Inspired by fastfetch, with GIF logo display centered above system information.
 
+> **Note**: This repository previously contained a Python implementation. The C version is now the primary implementation, offering better performance and lower dependencies. The Python code remains in the repository for reference.
+
 ## Quick Start
 
 Get started in 3 simple steps:
@@ -120,6 +122,17 @@ AnimatedFetching is a C program that:
 4. **Centers Output**: Calculates terminal width and centers both the GIF and system information
 
 The implementation is inspired by fastfetch's approach to system information gathering, with added GIF rendering capabilities.
+
+### Technical Details
+
+- **Language**: C11 standard
+- **System Info**: Direct system calls (`gethostname`, `uname`, `sysinfo`) and `/proc` filesystem parsing
+- **GIF Decoding**: giflib library for reading GIF files
+- **Terminal Output**: 24-bit RGB ANSI escape sequences (`\033[38;2;R;G;Bm`)
+- **Centering**: Dynamic calculation based on `ioctl(TIOCGWINSZ)` for terminal width
+- **Frame Selection**: Displays the first frame of animated GIFs (static display)
+
+For more detailed design information, see [DESIGN.md](DESIGN.md).
 
 ## Command Line Options
 
