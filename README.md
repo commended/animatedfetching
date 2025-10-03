@@ -2,6 +2,27 @@
 
 An animated terminal fetch program designed by aug with animated GIF support, customizable configuration, and clickable buttons for running commands.
 
+## Quick Start
+
+Get started in 3 simple steps:
+
+```bash
+# 1. Clone and install
+git clone https://github.com/commended/animatedfetching.git
+cd animatedfetching
+pip install -e .
+
+# 2. Run it!
+animatedfetching
+# or use the short alias
+afetch
+```
+
+That's it! On first run, AnimatedFetching will automatically:
+- ✨ Create a default configuration at `~/.config/animatedfetching/config.jsonc`
+- 🎨 Install a default GitHub logo animation at `~/.config/animatedfetching/animation.gif`
+- 🚀 Display your system information with the animated logo
+
 ## Features
 
 - 🎨 **Animated GIF Support**: Display animated GIFs in your terminal alongside system information
@@ -11,6 +32,24 @@ An animated terminal fetch program designed by aug with animated GIF support, cu
 - 🎯 **Fastfetch-like**: Similar configuration style and functionality to fastfetch
 
 ## Installation
+
+### Quick Install (Recommended)
+
+```bash
+git clone https://github.com/commended/animatedfetching.git
+cd animatedfetching
+pip install -e .
+```
+
+No additional setup required! Just run `animatedfetching` or `afetch` and it will set up everything on first run.
+
+### Manual Configuration (Optional)
+
+If you want to create the configuration before first run:
+
+```bash
+animatedfetching --create-config
+```
 
 ### From Source
 

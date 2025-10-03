@@ -5,6 +5,7 @@ Configuration module for AnimatedFetching
 
 import os
 import json
+import shutil
 from pathlib import Path
 from jsoncomment import JsonComment
 
@@ -102,6 +103,22 @@ class Config:
         
         # Create directory if it doesn't exist
         Path(config_dir).mkdir(parents=True, exist_ok=True)
+        
+        # Copy default GIF if it doesn't exist
+        gif_path = os.path.expanduser(cls.DEFAULT_CONFIG['animation']['path'])
+        if not os.path.exists(gif_path):
+            try:
+                # Get the path to the bundled default GIF
+                package_dir = os.path.dirname(os.path.abspath(__file__))
+                default_gif = os.path.join(package_dir, 'resources', 'default_animation.gif')
+                
+                if os.path.exists(default_gif):
+                    shutil.copy(default_gif, gif_path)
+                    print(f"Created default animation at: {gif_path}")
+                else:
+                    print(f"Note: Default GIF not found at {default_gif}")
+            except Exception as e:
+                print(f"Warning: Could not copy default GIF: {e}")
         
         # Write default config with comments
         with open(config_path, 'w') as f:
