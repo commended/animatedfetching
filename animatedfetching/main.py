@@ -52,21 +52,23 @@ class AnimatedFetching:
     
     def render_info_section(self):
         """Render system information section"""
-        table = Table(show_header=False, box=None, padding=(0, 1))
-        table.add_column("Label", style="bold", no_wrap=True)
+        table = Table(show_header=False, box=None, padding=(0, 1), collapse_padding=True)
+        table.add_column("Label", style="bold", no_wrap=True, width=10)
         table.add_column("Value")
         
-        # Add hostname if configured
+        # Add hostname if configured (more compact)
         if self.config.get('layout', {}).get('show_hostname', True):
             hostname = self.sysinfo.get('hostname', 'unknown')
             table.add_row(
-                Text("Host", style=self.config.get('colors', {}).get('title', 'bold cyan')),
-                Text(hostname, style="bold")
+                Text("━" * 25, style="dim"), ""
             )
-            
-            # Add separator
-            separator = self.config.get('layout', {}).get('separator', '─')
-            table.add_row(Text(separator * 30, style="dim"), "")
+            table.add_row(
+                Text(hostname, style=self.config.get('colors', {}).get('title', 'bold cyan')),
+                ""
+            )
+            table.add_row(
+                Text("━" * 25, style="dim"), ""
+            )
         
         # Add configured info sections
         for section in self.config.get('info_sections', []):
