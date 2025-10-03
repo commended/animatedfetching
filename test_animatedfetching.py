@@ -89,6 +89,68 @@ def test_display():
         return False
 
 
+def test_first_run_setup():
+    """Test automatic config creation on first run"""
+    print("Testing first-run setup...")
+    
+    import tempfile
+    import shutil
+    
+    try:
+        # Create a temporary directory for test config
+        temp_dir = tempfile.mkdtemp()
+        test_config_path = os.path.join(temp_dir, "test_config.jsonc")
+        # The GIF path should be based on the config's default
+        test_gif_dir = os.path.join(temp_dir, "animatedfetching")
+        os.makedirs(test_gif_dir, exist_ok=True)
+        test_gif_path = os.path.join(test_gif_dir, "animation.gif")
+        
+        # Clean up if exists
+        if os.path.exists(test_config_path):
+            os.remove(test_config_path)
+        if os.path.exists(test_gif_path):
+            os.remove(test_gif_path)
+        
+        # Temporarily modify the default config path for testing
+        original_default_path = Config.DEFAULT_CONFIG['animation']['path']
+        Config.DEFAULT_CONFIG['animation']['path'] = test_gif_path
+        
+        # Test config creation
+        created_path = Config.create_default_config(test_config_path)
+        assert os.path.exists(created_path), "Config file was not created"
+        assert os.path.exists(test_gif_path), "Default GIF was not created"
+        
+        # Restore original default path
+        Config.DEFAULT_CONFIG['animation']['path'] = original_default_path
+        
+        # Verify config can be loaded
+        config = Config.load(test_config_path)
+        assert config is not None, "Config could not be loaded"
+        assert 'animation' in config, "Config missing animation section"
+        assert 'info_sections' in config, "Config missing info_sections"
+        assert 'buttons' in config, "Config missing buttons"
+        
+        # Verify GIF is valid
+        from PIL import Image
+        img = Image.open(test_gif_path)
+        assert img.format == 'GIF', "Created file is not a GIF"
+        
+        # Clean up
+        shutil.rmtree(temp_dir)
+        
+        print("✓ First-run setup test passed")
+        return True
+    except Exception as e:
+        print(f"✗ First-run setup test failed: {e}")
+        # Restore original default path if test failed
+        if 'original_default_path' in locals():
+            Config.DEFAULT_CONFIG['animation']['path'] = original_default_path
+        # Clean up on error
+        if 'temp_dir' in locals() and os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
+        return False
+
+
 def main():
     """Run all tests"""
     print("=" * 60)
@@ -101,6 +163,7 @@ def main():
         test_config,
         test_app_initialization,
         test_display,
+        test_first_run_setup,
     ]
     
     results = []

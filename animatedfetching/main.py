@@ -24,6 +24,15 @@ class AnimatedFetching:
     
     def __init__(self, config_path=None):
         self.console = Console()
+        
+        # Auto-create config if it doesn't exist and no custom path is specified
+        default_config_path = Config.DEFAULT_CONFIG_PATH
+        if config_path is None and not os.path.exists(default_config_path):
+            self.console.print("[yellow]No configuration found. Creating default configuration...[/yellow]")
+            Config.create_default_config()
+            self.console.print("[green]✓ Setup complete! You can customize the config at:[/green]")
+            self.console.print(f"  {default_config_path}\n")
+        
         self.config = Config.load(config_path)
         self.sysinfo = SystemInfo.get_all()
         

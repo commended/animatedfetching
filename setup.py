@@ -19,6 +19,10 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/commended/animatedfetching",
     packages=find_packages(),
+    package_data={
+        'animatedfetching': ['resources/*.gif'],
+    },
+    include_package_data=True,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: End Users/Desktop",
