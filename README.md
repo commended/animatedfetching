@@ -1,102 +1,57 @@
 # AnimatedFetching
 
-An animated terminal fetch program written in C, designed by aug with animated GIF support. Inspired by fastfetch, with GIF logo display centered above system information.
-
-> **Note**: This repository previously contained a Python implementation. The C version is now the primary implementation, offering better performance and lower dependencies. The Python code remains in the repository for reference.
-
-## Quick Start
-
-Get started in 3 simple steps:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/commended/animatedfetching.git
-cd animatedfetching
-
-# 2. Run the setup script
-./setup.sh
-
-# 3. Run it!
-./bin/afetch
-```
-
-That's it! The setup script will:
-- Check for required dependencies (giflib)
-- Build the program
-- Create the configuration directory
-- Install the default GIF animation
-
-The program will display your system information with the GIF logo centered above it.
+A fast terminal fetch program written in C with GIF logo support. Inspired by fastfetch.
 
 ## Features
 
-- 🎨 **Animated GIF Support**: Display animated GIFs as logos in your terminal
-- 🚀 **Written in C**: Fast and lightweight, inspired by fastfetch
-- 📊 **System Information**: Display OS, kernel, uptime, CPU, memory, and more
-- 🎯 **Centered Layout**: GIF displayed on top, system info centered below
-- 🖥️ **Terminal Colors**: Full 24-bit RGB color support for GIF rendering
+- 🎨 **GIF Logo Support**: Display GIF images as logos in your terminal
+- 🚀 **Fast & Lightweight**: Written in C, minimal dependencies
+- 📊 **System Information**: OS, kernel, uptime, CPU, memory, and more
+- 🎯 **Centered Layout**: Clean, centered display
+- 🖥️ **True Color**: Full 24-bit RGB color support
 
 ## Installation
 
-### Quick Setup (Recommended)
+### One-Line Install
 
 ```bash
+git clone https://github.com/commended/animatedfetching.git && cd animatedfetching && ./setup.sh && sudo make install
+```
+
+### Step-by-Step Install
+
+```bash
+# 1. Clone and setup
 git clone https://github.com/commended/animatedfetching.git
 cd animatedfetching
+
+# 2. Install dependencies
+# Debian/Ubuntu:
+sudo apt install libgif-dev
+
+# Fedora:
+sudo dnf install giflib-devel
+
+# Arch:
+sudo pacman -S giflib
+
+# 3. Build and install globally
 ./setup.sh
-```
-
-The setup script will automatically:
-1. Check for dependencies
-2. Build the program
-3. Create configuration directory at `~/.config/animatedfetching`
-4. Install the default GIF animation
-
-### Manual Build
-
-```bash
-git clone https://github.com/commended/animatedfetching.git
-cd animatedfetching
-make
-```
-
-### Install System-wide
-
-```bash
 sudo make install
 ```
 
-This installs the binary to `/usr/local/bin/afetch`.
+The setup script will:
+- Build the program
+- Create `~/.config/animatedfetching/` directory
+- Install the default GIF animation
 
-### Dependencies
-
-The following libraries are required:
-- giflib (libgif-dev on Debian/Ubuntu, giflib-devel on Fedora)
-
-Install on Debian/Ubuntu:
-```bash
-sudo apt install libgif-dev
-```
-
-Install on Fedora:
-```bash
-sudo dnf install giflib-devel
-```
-
-Install on Arch:
-```bash
-sudo pacman -S giflib
-```
+After installation, you can run `afetch` from anywhere.
 
 ## Usage
 
-### Basic Usage
-
-Display system information with GIF logo:
+Run `afetch` to display your system information:
 
 ```bash
-./bin/afetch
-# or if installed system-wide:
 afetch
 ```
 
@@ -110,67 +65,63 @@ afetch --gif /path/to/your/animation.gif
 afetch -g /path/to/your/animation.gif
 ```
 
-The default GIF location is `~/.config/animatedfetching/animation.gif`.
+Set your default GIF:
 
-## How It Works
+```bash
+cp your-logo.gif ~/.config/animatedfetching/animation.gif
+```
 
-AnimatedFetching is a C program that:
+## Updating
 
-1. **Gathers System Information**: Uses Linux system calls to collect information about your system (hostname, OS, kernel, uptime, shell, terminal, CPU, memory)
-2. **Loads GIF Files**: Uses the giflib library to load and decode GIF images
-3. **Renders in Terminal**: Converts GIF pixels to colored block characters (█) using 24-bit RGB ANSI escape codes
-4. **Centers Output**: Calculates terminal width and centers both the GIF and system information
+To update to the latest version:
 
-The implementation is inspired by fastfetch's approach to system information gathering, with added GIF rendering capabilities.
+```bash
+cd animatedfetching
+git pull
+make clean
+make
+sudo make install
+```
 
-### Technical Details
+## Uninstalling
 
-- **Language**: C11 standard
-- **System Info**: Direct system calls (`gethostname`, `uname`, `sysinfo`) and `/proc` filesystem parsing
-- **GIF Decoding**: giflib library for reading GIF files
-- **Terminal Output**: 24-bit RGB ANSI escape sequences (`\033[38;2;R;G;Bm`)
-- **Centering**: Dynamic calculation based on `ioctl(TIOCGWINSZ)` for terminal width
-- **Frame Selection**: Displays the first frame of animated GIFs (static display)
+To remove AnimatedFetching:
 
-For more detailed design information, see [DESIGN.md](DESIGN.md).
+```bash
+sudo make uninstall
+```
+
+Optionally remove the configuration directory:
+
+```bash
+rm -rf ~/.config/animatedfetching
+```
 
 ## Command Line Options
 
 ```
 Usage: afetch [OPTIONS]
 
-AnimatedFetching - A terminal fetch program with GIF support
-
 Options:
   -g, --gif <path>    Path to GIF file (default: ~/.config/animatedfetching/animation.gif)
   -h, --help          Show this help message
 ```
 
-## Examples
-
-### Display with default GIF:
-```bash
-afetch
-```
-
-### Use custom GIF:
-```bash
-afetch --gif ~/Pictures/my-logo.gif
-```
-
-### Setup default GIF location:
-```bash
-mkdir -p ~/.config/animatedfetching
-cp my-animation.gif ~/.config/animatedfetching/animation.gif
-afetch
-```
-
 ## Tips
 
-1. **Add your own GIF**: Place any GIF file at `~/.config/animatedfetching/animation.gif`
-2. **Terminal compatibility**: Best viewed in terminals with 24-bit RGB color support (most modern terminals)
-3. **GIF size**: Keep GIFs reasonably sized (under 1MB) for faster loading
-4. **First frame**: Currently displays only the first frame of animated GIFs (static display)
+1. **Add your own GIF**: Place any GIF at `~/.config/animatedfetching/animation.gif`
+2. **Terminal compatibility**: Works best with terminals that support 24-bit RGB colors
+3. **GIF size**: Keep GIFs under 1MB for faster loading
+4. **Animation**: Currently displays the first frame of animated GIFs (static display)
+
+## Technical Details
+
+- **Language**: C11
+- **Dependencies**: giflib only
+- **System Info**: Direct system calls and `/proc` filesystem parsing
+- **Rendering**: 24-bit RGB ANSI escape codes
+
+For more details, see [DESIGN.md](DESIGN.md).
 
 ## License
 
