@@ -2,26 +2,35 @@
 
 ## Quick Start
 
-### 1. Install the package
+### Install and Run (2 Steps!)
 
 ```bash
-# Clone the repository
+# 1. Clone and install
 git clone https://github.com/commended/animatedfetching.git
 cd animatedfetching
-
-# Install dependencies and the package
 pip install -e .
+
+# 2. Run it!
+animatedfetching
+# or use the short alias
+afetch
 ```
 
-### 2. Create default configuration
+**That's it!** On first run, AnimatedFetching will automatically:
+- ✨ Create a default configuration at `~/.config/animatedfetching/config.jsonc`
+- 🎨 Install a default GitHub logo animation at `~/.config/animatedfetching/animation.gif`
+
+### Optional: Create Config Before First Run
+
+If you want to create and customize the configuration before running:
 
 ```bash
 animatedfetching --create-config
 ```
 
-This creates `~/.config/animatedfetching/config.jsonc` with default settings.
+Then edit `~/.config/animatedfetching/config.jsonc` to your liking before running the program.
 
-### 3. Run the program
+### Run Modes
 
 ```bash
 # Basic mode - display system info
@@ -36,8 +45,10 @@ animatedfetching -i
 
 ## Adding Custom GIF
 
+The default installation includes a GitHub logo animation. You can easily replace it:
+
 1. Find or create an animated GIF
-2. Place it at `~/.config/animatedfetching/animation.gif`
+2. Replace `~/.config/animatedfetching/animation.gif` with your GIF
 3. Or configure a custom path in the config file:
 
 ```jsonc
@@ -185,12 +196,16 @@ Available colors for `color` fields:
 ## Troubleshooting
 
 ### Config file not found
-Run `animatedfetching --create-config` to create the default configuration.
+This should not happen anymore! The config is created automatically on first run. If you still have issues, run:
+```bash
+animatedfetching --create-config
+```
 
 ### GIF not displaying
-1. Ensure the GIF file exists at the configured path
-2. Check that `animation.enabled` is `true` in the config
-3. Verify the GIF file is a valid animated GIF
+1. The default GIF is automatically installed on first run
+2. If you replaced it, ensure the GIF file exists at the configured path
+3. Check that `animation.enabled` is `true` in the config
+4. Verify the GIF file is a valid animated GIF
 
 ### Commands not running in interactive mode
 1. Make sure you run with `-i` flag: `animatedfetching -i`
