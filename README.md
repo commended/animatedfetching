@@ -7,16 +7,24 @@ An animated terminal fetch program written in C, designed by aug with animated G
 Get started in 3 simple steps:
 
 ```bash
-# 1. Clone and build
+# 1. Clone the repository
 git clone https://github.com/commended/animatedfetching.git
 cd animatedfetching
-make
 
-# 2. Run it!
+# 2. Run the setup script
+./setup.sh
+
+# 3. Run it!
 ./bin/afetch
 ```
 
-That's it! The program will display your system information with the GIF logo centered above it.
+That's it! The setup script will:
+- Check for required dependencies (giflib)
+- Build the program
+- Create the configuration directory
+- Install the default GIF animation
+
+The program will display your system information with the GIF logo centered above it.
 
 ## Features
 
@@ -28,7 +36,21 @@ That's it! The program will display your system information with the GIF logo ce
 
 ## Installation
 
-### Build from Source
+### Quick Setup (Recommended)
+
+```bash
+git clone https://github.com/commended/animatedfetching.git
+cd animatedfetching
+./setup.sh
+```
+
+The setup script will automatically:
+1. Check for dependencies
+2. Build the program
+3. Create configuration directory at `~/.config/animatedfetching`
+4. Install the default GIF animation
+
+### Manual Build
 
 ```bash
 git clone https://github.com/commended/animatedfetching.git
